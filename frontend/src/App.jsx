@@ -5,6 +5,7 @@ const API_URL = 'http://localhost:3001';
 
 const App = () => {
   const [movies, setMovies] = useState([]);
+  const [newMovie, setNewMovie] = useState({ title: '', description: '' });
 
   useEffect(() => {
     fetchMovies();
@@ -12,18 +13,18 @@ const App = () => {
 
   const fetchMovies = async () => {
     try {
-      const response = await axios.get(`${API_URL}/movies/1`);
-      setMovies(response.data.data);
+      const response = await axios.get(`${API_URL}/movies`);
+      setMovies(response.data);
     } catch (error) {
       console.error('Error fetching movies:', error);
     }
   };
 
-  const handleAddMovie = async (movieData) => {
+  const handleAddMovie = async () => {
     try {
-      const response = await axios.post(`${API_URL}/movies`, movieData);
-      const newMovie = response.data.data;
-      setMovies([...movies, newMovie]);
+      const response = await axios.post(`${API_URL}/movies`, newMovie);
+      setMovies([...movies, response.data.data]);
+      setNewMovie({ title: '', description: '' });
     } catch (error) {
       console.error('Error adding movie:', error);
     }
@@ -50,15 +51,25 @@ const App = () => {
           </li>
         ))}
       </ul>
+
       <h2>Add New Movie</h2>
       <form onSubmit={(e) => {
         e.preventDefault();
-        handleAddMovie({ title: e.target.title.value, description: e.target.description.value });
-        e.target.title.value = '';
-        e.target.description.value = '';
+        handleAddMovie();
       }}>
-        <input type="text" placeholder="Title" name="title" />
-        <textarea placeholder="Description" name="description" />
+        <input
+          type="text"
+          placeholder="Title"
+          name="title"
+          value={newMovie.title}
+          onChange={(e) => setNewMovie({ ...newMovie, title: e.target.value })}
+        />
+        <textarea
+          placeholder="Description"
+          name="description"
+          value={newMovie.description}
+          onChange={(e) => setNewMovie({ ...newMovie, description: e.target.value })}
+        />
         <button type="submit">Add Movie</button>
       </form>
     </div>
